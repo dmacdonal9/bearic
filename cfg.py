@@ -2,7 +2,7 @@ symbol_list = ['SPX']
 
 myStrategyTag = 'bearorb'
 check_min_vix = True
-max_vix_pct = 0
+max_vix_pct = 0 #
 adaptive_priority= 'Normal'
 
 sleep_after_order = 4
