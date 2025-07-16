@@ -1,6 +1,7 @@
 symbol_list = ['SPX']
 
 myStrategyTag = 'bearorb'
+pushover_alerts = True
 check_min_vix = True
 max_vix_pct = 0 #
 adaptive_priority= 'Normal'

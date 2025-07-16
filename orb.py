@@ -9,6 +9,7 @@ from ibstrat.adaptive import submit_adaptive_order
 from ibstrat.chain import fetch_option_chain
 from ibstrat.positions import check_positions
 from ibstrat.ticksize import get_tick_size, adjust_to_tick_size
+from ibstrat.pushover import send_notification
 from zoneinfo import ZoneInfo
 from math import isnan
 import logging
@@ -152,6 +153,8 @@ def submit_ic_combo(und_contract, current_price: float, is_live: bool = False):
         else:
             logger.error("Order submission failed.")
 
+        if cfg.pushover_alerts:
+            send_notification("BEARORB opened")
         return trade
 
     except Exception as e:
