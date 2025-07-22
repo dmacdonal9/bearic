@@ -11,6 +11,7 @@ from ibstrat.positions import check_positions
 from ibstrat.ticksize import get_tick_size, adjust_to_tick_size
 from ibstrat.pushover import send_notification
 from zoneinfo import ZoneInfo
+from ibstrat.tradecount import *
 from math import isnan
 import logging
 import cfg
@@ -153,8 +154,10 @@ def submit_ic_combo(und_contract, current_price: float, is_live: bool = False):
         else:
             logger.error("Order submission failed.")
 
+        new_trade_count = increment_trade_counter(und_contract.symbol)
+        logger.info(f"{und_contract.symbol} trade #{new_trade_count} opened.")
         if cfg.pushover_alerts:
-            send_notification("BEARORB opened")
+            send_notification(f"Opened bearorb, trade #{new_trade_count}")
         return trade
 
     except Exception as e:

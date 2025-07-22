@@ -21,6 +21,7 @@ test_ib_clientid = 10  # Client ID for test TWS
 orb_ic_params = {
     'SPX': {
         "quantity": 1,
+        "max_open_trades": 1,
         "exchange": 'CBOE',
         "opt_exchange": 'CBOE',
         "trading_class": 'SPXW',
@@ -34,6 +35,7 @@ orb_ic_params = {
     },
     'ES': {
         "quantity": 1,
+        "max_open_trades": 1,
         "exchange": 'CME',
         "opt_exchange": 'CME',
         "trading_class": '',
@@ -47,6 +49,7 @@ orb_ic_params = {
     },
     'NQ': {
         "quantity": 1,
+        "max_open_trades": 1,
         "exchange": 'CME',
         "opt_exchange": 'CME',
         "trading_class": '',

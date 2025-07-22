@@ -6,6 +6,7 @@ from ibstrat.orders import adj_price_for_order
 from ibstrat.market_data import get_current_mid_price
 from ibstrat.indicators import calc_vix_pct_move_from_open
 from ibstrat.positions import load_positions
+from ibstrat.tradecount import get_trade_counter
 from orb import check_orb, submit_ic_combo
 import cfg
 import argparse
@@ -69,10 +70,18 @@ if __name__ == "__main__":
         try:
             orb_params = cfg.orb_ic_params.get(symbol)
             use_adaptive_on_combo = orb_params['use_adaptive_on_combo']
+            max_open_trades = orb_params['max_open_trades']
 
             if not orb_params:
                 logger.warning(f"No ORB parameters found for symbol {symbol}. Skipping.")
                 continue
+
+            current_trade_count = get_trade_counter(symbol)
+            if current_trade_count >= max_open_trades:
+                logger.info(f"Skipping {symbol} due to {current_trade_count} open trades of max {max_open_trades}.")
+                continue
+            else:
+                logger.info(f"We have {current_trade_count} open trades of max {max_open_trades} for {symbol}.")
 
             und_sec_type = orb_params['sec_type']
             exchange = orb_params['exchange']
