@@ -4,6 +4,7 @@ from ibstrat.market_data import get_current_mid_price, get_bag_prices
 from ibstrat.dteutil import get_today_expiry
 from ibstrat.options import find_options_by_target_strikes, find_option_by_target_delta
 from ibstrat.orders import create_bag, submit_limit_order, adj_price_for_order
+from ibstrat.tradelog import log_trade_details
 from ibstrat.trclass import get_trading_class_for_symbol
 from ibstrat.adaptive import submit_adaptive_order
 from ibstrat.chain import fetch_option_chain
@@ -158,6 +159,17 @@ def submit_ic_combo(und_contract, current_price: float, is_live: bool = False):
         logger.info(f"{und_contract.symbol} trade #{new_trade_count} opened.")
         if cfg.pushover_alerts:
             send_notification(f"Opened bearorb, trade #{new_trade_count}")
+
+        if trade and is_live and cfg.log_trade_fills:
+            logger.info("Calling log_trade_details()")
+            log_trade_details(und_contract=und_contract,
+                              trade_contract=bag_contract,
+                              mid_price=mid,
+                              trade=trade,
+                              timeout=cfg.trade_fill_timeout,
+                              sheet_id=cfg.trade_log_sheet_id,
+                              strategy_tag=cfg.myStrategyTag)
+
         return trade
 
     except Exception as e:

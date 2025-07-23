@@ -6,6 +6,11 @@ check_min_vix = True
 max_vix_pct = 0 #
 adaptive_priority= 'Normal'
 
+#tradelog
+trade_fill_timeout = 120
+log_trade_fills = True
+trade_log_sheet_id = "1y9hYBzSA4g8n92VkEgQp_JKu_F-XyI02RmbGjXin0hU"
+
 sleep_after_order = 4
 
 # IBKR Connection Parameters
