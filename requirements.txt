@@ -7,6 +7,8 @@ korean-lunar-calendar
 nest-asyncio
 numpy
 pandas
+google
+google-api-python-client
 pandas_market_calendars
 pandas_ta
 pyluach
