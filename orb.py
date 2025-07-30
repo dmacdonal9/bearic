@@ -105,6 +105,7 @@ def submit_ic_combo(und_contract, current_price: float, is_live: bool = False):
         existing_pos_open = check_positions(und_contract.symbol, pos_check_list)
         if existing_pos_open:
             logger.warning(f"We have potential collisions on strikes, aborting trade")
+            send_notification("BEARORB aborted due to strike collision")
             return None
 
         # Construct the combo legs
