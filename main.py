@@ -7,7 +7,7 @@ from ibstrat.market_data import get_current_mid_price, get_pct_move_from_open
 from ibstrat.indicators import calc_vix_pct_move_from_open
 from ibstrat.positions import load_positions
 from ibstrat.tradecount import get_trade_counter
-from condor import check_orb, submit_ic_combo
+from condor import submit_ic_combo
 import cfg
 import argparse
 import sys
