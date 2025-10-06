@@ -8,6 +8,7 @@ nest-asyncio
 numpy
 pandas
 google
+gspread
 google-api-python-client
 pandas_market_calendars
 pandas_ta
