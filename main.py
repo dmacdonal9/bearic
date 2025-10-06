@@ -3,11 +3,11 @@ from ibstrat.ib_instance import connect_to_ib
 from ibstrat.qualify import qualify_contract, get_front_month_contract_date
 from ibstrat.dteutil import get_today_expiry
 from ibstrat.orders import adj_price_for_order
-from ibstrat.market_data import get_current_mid_price
+from ibstrat.market_data import get_current_mid_price, get_pct_move_from_open
 from ibstrat.indicators import calc_vix_pct_move_from_open
 from ibstrat.positions import load_positions
 from ibstrat.tradecount import get_trade_counter
-from orb import check_orb, submit_ic_combo
+from condor import check_orb, submit_ic_combo
 import cfg
 import argparse
 import sys
@@ -58,8 +58,8 @@ if __name__ == "__main__":
             logger.error("Can't get VIX move, exiting...")
             sys.exit(-1)
 
-        if vix_move < cfg.max_vix_pct:
-            logger.info("VIX move is negative, not trading Bear ORB today, exiting...")
+        if vix_move < cfg.min_vix_pct:
+            logger.info("VIX move is negative, not trading Bear IC today, exiting...")
             sys.exit(0)
         else:
             logger.info(f"VIX move is positive at {vix_move}%, proceeding...")
@@ -68,11 +68,11 @@ if __name__ == "__main__":
 
     for symbol in cfg.symbol_list:
         try:
-            orb_params = cfg.orb_ic_params.get(symbol)
-            use_adaptive_on_combo = orb_params['use_adaptive_on_combo']
-            max_open_trades = orb_params['max_open_trades']
+            params = cfg.ic_params.get(symbol)
+            use_adaptive_on_combo = params['use_adaptive_on_combo']
+            max_open_trades = params['max_open_trades']
 
-            if not orb_params:
+            if not params:
                 logger.warning(f"No ORB parameters found for symbol {symbol}. Skipping.")
                 continue
 
@@ -83,26 +83,26 @@ if __name__ == "__main__":
             else:
                 logger.info(f"We have {current_trade_count} open trades of max {max_open_trades} for {symbol}.")
 
-            und_sec_type = orb_params['sec_type']
-            exchange = orb_params['exchange']
+            und_sec_type = params['sec_type']
+            exchange = params['exchange']
 
             if und_sec_type == 'FUT':
-                fut_date = get_front_month_contract_date(symbol, exchange, orb_params["mult"], get_today_expiry(),1)
+                fut_date = get_front_month_contract_date(symbol, exchange, params["mult"], get_today_expiry(), 1)
             else:
                 fut_date = ''
 
             und_contract = qualify_contract(symbol, und_sec_type, fut_date, exchange, currency="USD",
-                                            tradingClass=orb_params['trading_class'])
+                                            tradingClass=params['trading_class'])
             current_price = get_current_mid_price(und_contract, 2, 1, False)
 
             if not override_checks:
 
-                is_low_orb = check_orb(contract=und_contract, orb_seconds=3600, orb_type='low')
-                logger.info(f"ORB low check for {symbol}: {is_low_orb}")
-
-                if not is_low_orb:
-                    logger.info(f"No ORB for {symbol} at price {current_price}, skipping trade.")
+                id_move = get_pct_move_from_open(und_contract)
+                if id_move > cfg.min_move_down:
+                    logger.info(f"Move down is not sufficient, aborting...")
                     continue
+                else:
+                    logger.info(f"Move down is sufficient, continuing...")
 
             trade = submit_ic_combo(und_contract, current_price, live_orders)
             if trade:
